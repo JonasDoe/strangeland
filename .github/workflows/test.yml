@@ -10,4 +10,4 @@ jobs:
           python-version: '3.x'
       - name: Python unit tests
         run: |
-          python -m unittest
+          python -m unittest discover . *_test.py
