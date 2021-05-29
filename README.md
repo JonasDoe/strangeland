@@ -4,8 +4,8 @@ Tooling for the Strangeland translation.
 
 ## `add_prefixes`
 
-Use this script to migrated an outdated translation without prefixes (like `&31`) to a new one. You need the to download
-the file `add_prefixes.py` and must called it with two or three arguments, e.g.
+Use this script to migrate an outdated translation without prefixes (like `&31`) to a new one. You need the to download
+the file `add_prefixes.py` and must call it with two or three arguments, e.g.
 
 ```shell
 python add_prefixes.py my_old_version.trs new_template.trs merged.trs
@@ -18,7 +18,7 @@ and there.
 Overrides any existing file
 
 Python 3.x must be available. In case you've installed it, open the Windows Command Prompt and insert the line above. In
-case you've just downloaded it somewhere and Windows doesn't what `python` means, you must run it with
+case you've just downloaded it somewhere and Windows doesn't know what `python` means, you must run it with
 
 ```shell
 my/path/to/python.exe add_prefixes.py my_old_version.trs new_template.trs merged.trs
@@ -32,10 +32,10 @@ In general, it works like that:
 
 | old version | new version | merged version  | comment |
 |---|---|---|---|
-| `english text`<br>`translation text`  | `&31 english text`<br>` ` | `&31 english text`<br>`&31 translation text` | prefixes got taken from the new file
-| `&31 english text`<br>`&31 translation text`  | `&31 english text`<br>` ` | `&31 english text`<br>`&31 translation text` | prefixes in the old file do no harm
-| `english text`<br>` ` | `&31 english text`<br>`&31 translation text` | `&31 english text`<br>`&31 translation text` | if there's only a translation in the new file it will be used
-| `english text`<br>`translation text` | `&31 english text`<br>`&31 other translation text` | `&31 english text`<br>`&31 translation text` | in doubt the translation of the old file will be used
+| `english`<br>`translation`  | `&31 english`<br>` ` | `&31 english`<br>`&31 translation` | prefixes got taken from the new file
+| `&31 english`<br>`&31 translation`  | `&31 english`<br>` ` | `&31 english`<br>`&31 translation` | prefixes in the old file do no harm
+| `english`<br>` ` | `&31 english`<br>`&31 translation` | `&31 english`<br>`&31 translation` | if there's only a translation in the new file it will be used
+| `english`<br>`translation` | `&31 english`<br>`&31 other` | `&31 english`<br>`&31 translation` | in doubt the translation of the old file will be used
 
 ### Prerequisites
 
