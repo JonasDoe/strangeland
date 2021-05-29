@@ -78,11 +78,13 @@ def validate_lines(old_lines: [str], new_lines: [str], file_name_old: str = 'old
                             next(line_no_iter)
                             validated_lines.append(new_line)
                             validated_lines.append(old_line_translation)
+                            print('--------------\n')
                         elif choice == '2':
                             next(line_no_iter)
                             validated_lines.append(new_line)
                             translation = input('\nNew translation:\n')
                             validated_lines.append(re.sub(linebreak_pattern, '', translation))
+                            print('--------------\n')
                         else:
                             errors.append(f'Line {line_no + 1} differs: "{old_line}" ({file_name_old} with ' +
                                           f'interpolated prefix) vs "{new_line}" ({file_name_new}).')

@@ -75,6 +75,7 @@ Enter number:
 
 New translation:
 Weil ... wir schon verdammt sind.
+--------------
 Line 2651 differs:
 No (german.trs)
 No    (english.trs)
@@ -87,6 +88,7 @@ Enter number:
 (2) Keep new english line and enter new custom line
 (3) Abort
 1
+--------------
 Line 2659 differs:
 Wow. (german.trs)
 &3 Wow.    (english.trs)
@@ -115,7 +117,7 @@ lost!
 ## Shortcomings
 
 - It's pure cli-tool and is not recommended if there are huge changes to be merged. Resort to another tool like [
-  WinMerge}(https://winmerge.org) in that case. Once all major changes have been sorted out, you can go back to this
+  WinMerge](https://winmerge.org) in that case. Once all major changes have been sorted out, you can go back to this
   tool.
 - There's no back-option. If you are in a semi-trance while tapping 1 + ENTER, you might accept a translation which
   could have needed some adjustments. You have to scroll up and write it down for later, or you have abort, merge your
