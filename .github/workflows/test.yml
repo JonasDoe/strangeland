@@ -8,5 +8,5 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - name: Unit Testing
-        uses: PrajjawalBanati/Python-actions@0.0.1
+      - name: Test
+        uses: onichandame/python-test-action@master
