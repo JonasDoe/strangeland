@@ -32,10 +32,10 @@ In general, it works like that:
 
 | old version | new version | merged version  | comment |
 |---|---|---|---|
-| `english`<br>`translation`  | `&31 english`<br>` ` | `&31 english`<br>`&31 translation` | prefixes got taken from the new file
-| `&31 english`<br>`&31 translation`  | `&31 english`<br>` ` | `&31 english`<br>`&31 translation` | prefixes in the old file do no harm
-| `english`<br>` ` | `&31 english`<br>`&31 translation` | `&31 english`<br>`&31 translation` | if there's only a translation in the new file it will be used
-| `english`<br>`translation` | `&31 english`<br>`&31 other` | `&31 english`<br>`&31 translation` | in doubt the translation of the old file will be used
+| `english`<br>`german`  | `&31 english`<br>` ` | `&31 english`<br>`&31 german` | prefixes got taken from the new file
+| `&31 english`<br>`&31 german`  | `&31 english`<br>` ` | `&31 english`<br>`&31 german` | prefixes in the old file do no harm
+| `english`<br>` ` | `&31 english`<br>`&31 german` | `&31 english`<br>`&31 german` | if there's only a translation in the new file it will be used
+| `english`<br>`german` | `&31 english`<br>`&31 other` | `&31 english`<br>`&31 german` | in doubt the translation of the old file will be used
 
 ### Prerequisites
 
