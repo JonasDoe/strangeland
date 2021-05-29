@@ -7,22 +7,23 @@ class TestAddPrefixMethods(unittest.TestCase):
 
     def test_validate(self):
         # old and new version are compatible -> no error will be raised
-        validate_lines(["english text", "german text"], ["&31 english text", ""])
+        _, error = validate_lines(["english text", "german text"], ["&31 english text", ""])
+        self.assertIsNone(error)
 
         # old and new version are compatible -> no error will be raised
         validate_lines(["&31 english text", "&31 german text"], ["&31 english text", ""])
 
         # old and new version aren't compatible
-        with self.assertRaises(ValueError):
-            validate_lines(["english text", "german text"], ["&31 english text changed", ""])
+        _, error = validate_lines(["english text", "german text"], ["&31 english text changed", ""])
+        self.assertIsNotNone(error)
 
         # old version has wrong prefix
-        with self.assertRaises(ValueError):
-            validate_lines(["&13 english text", "&13 german text"], ["&31 english text changed", ""])
+        _, error = validate_lines(["&13 english text", "&13 german text"], ["&31 english text changed", ""])
+        self.assertIsNotNone(error)
 
         # old version has different prefixes
-        with self.assertRaises(ValueError):
-            validate_lines(["&31 english text", "&13 german text"], ["&31 english text changed", ""])
+        _, error = validate_lines(["&31 english text", "&13 german text"], ["&31 english text changed", ""])
+        self.assertIsNotNone(error)
 
     def test_merge(self):
         # merging adds prefixes where required
