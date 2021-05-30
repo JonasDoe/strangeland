@@ -21,6 +21,8 @@ and there.
 `merged.trs` is an optional argument specifying where the merged file shall be stored. Optional, defaults
 to `merged.trs`. Overrides any existing file
 
+File paths are allowed. Note that in case the file locations contain any spaces, they must be put in quotes, e.g. `"german - version 1"`.
+
 Python 3.x must be available. In case you've installed it, open the Windows Command Prompt and insert the line above. In
 case you've just downloaded it somewhere and Windows doesn't know what `python` means, you must run it with
 
