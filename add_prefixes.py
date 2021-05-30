@@ -1,5 +1,6 @@
 import re
 import sys
+import argparse
 
 """Used to find prefixes like '&31 '"""
 prefix_pattern = r"^(&[\d]*\ )"
@@ -170,45 +171,52 @@ def merge_lines(old_lines: [str], new_lines: [str]) -> [str]:
     return merged
 
 
-def run(args: [str]):
-    if len(args) < 3 or len(args) > 5:
-        raise ValueError('Invalid argument count. This script takes two to four arguments:\n' +
-                         '1.) location of the old file with the translation data (required)\n'
-                         '2.) location of the new file (required)\n'
-                         '3.) the encoding of the input and output files (e.g. utf-8 or cp1252), default = utf-8\n' +
-                         '4.) output file, default = merged.trs\n"'
-                         'So run the script with something like:'
-                         'python add_prefixes.py german.trs english.trs utf-8 merged.trs')
-    file_name_old: str = args[1]
-    file_name_new: str = args[2]
-    encoding: str = args[3] if len(args) > 3 else 'utf-8'
-    file_name_merged: str = args[4] if len(args) > 4 else 'merged.trs'
+def run():
+    translation_file_key = 'translation'
+    template_file_key = 'template'
+    output_file_key = 'output'
+    encoding_key = 'encoding'
+    parser = argparse.ArgumentParser(description='Validate and merge translation files')
+    parser.add_argument(translation_file_key, help='Location of the old file with the translation data')
+    parser.add_argument('--'+template_file_key,
+                        help='Location of the template file, preferably without any translated lines. Required for ' +
+                             'better validation and prefix determination.')
+    parser.add_argument('--'+output_file_key,
+                        help='Location of the output file', default='merged.trs')
+    parser.add_argument('--'+encoding_key, help='The encoding of the input and output files ', default='utf-8',
+                        choices=['utf-8', 'cp1252'])
+    parsed_args = parser.parse_args()
+
+    file_name_translation: str = getattr(parsed_args, translation_file_key)
+    file_name_template: str = getattr(parsed_args, template_file_key)
+    encoding: str = getattr(parsed_args, encoding_key)
+    output_file: str = getattr(parsed_args, output_file_key)
     sys.stdout.reconfigure(encoding=encoding)
     sys.stdin.reconfigure(encoding=encoding)
 
     old_lines: [str]
     new_lines: [str]
 
-    with open(file_name_old, 'r', encoding=encoding) as file_old, open(file_name_new, 'r',
-                                                                       encoding=encoding) as file_new:
+    with open(file_name_translation, 'r', encoding=encoding) as file_old, open(file_name_template, 'r',
+                                                                               encoding=encoding) as file_new:
         old_lines = file_old.readlines()
         new_lines = file_new.readlines()
 
-    [validated_lines, error] = validate_lines(old_lines, new_lines, file_name_old, file_name_new, True)
+    [validated_lines, error] = validate_lines(old_lines, new_lines, file_name_translation, file_name_template, True)
     if error is not None:
         print(f'{str(error)}\n'
               f'--------------\n'
               f'Canceled operation due to an error.\n'
-              f'The state until the line causing this error has been stored in {file_name_merged}.\n'
-              f'You might want to backup this results or replace regarding lines in {file_name_old} with them.')
-        with open(file_name_merged, 'w', encoding=encoding) as file_merged:
+              f'The state until the line causing this error has been stored in {output_file}.\n'
+              f'You might want to backup this results or replace regarding lines in {file_name_translation} with them.')
+        with open(output_file, 'w', encoding=encoding) as file_merged:
             file_merged.writelines('\n'.join(validated_lines))
         exit(1)
     else:
         merged = merge_lines(validated_lines, new_lines)
-        with open(file_name_merged, 'w', encoding=encoding) as file_merged:
+        with open(output_file, 'w', encoding=encoding) as file_merged:
             file_merged.writelines('\n'.join(merged))
 
 
 if __name__ == '__main__':
-    run(sys.argv)
+    run()
