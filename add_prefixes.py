@@ -181,8 +181,8 @@ def run(args: [str]):
                          'python add_prefixes.py german.trs english.trs utf-8 merged.trs')
     file_name_old: str = args[1]
     file_name_new: str = args[2]
-    encoding: str = args[3] if len(args) == 4 else 'utf-8'
-    file_name_merged: str = args[4] if len(args) == 5 else 'merged.trs'
+    encoding: str = args[3] if len(args) > 3 else 'utf-8'
+    file_name_merged: str = args[4] if len(args) > 4 else 'merged.trs'
     sys.stdout.reconfigure(encoding=encoding)
     sys.stdin.reconfigure(encoding=encoding)
 
@@ -197,10 +197,10 @@ def run(args: [str]):
     [validated_lines, error] = validate_lines(old_lines, new_lines, file_name_old, file_name_new, True)
     if error is not None:
         print(f'{str(error)}\n'
-            f'--------------\n'
-            f'Canceled operation due to an error.\n'
-            f'The state until the line causing this error has been stored in {file_name_merged}.\n'
-            f'You might want to backup this results or replace regarding lines in {file_name_old} with them.')
+              f'--------------\n'
+              f'Canceled operation due to an error.\n'
+              f'The state until the line causing this error has been stored in {file_name_merged}.\n'
+              f'You might want to backup this results or replace regarding lines in {file_name_old} with them.')
         with open(file_name_merged, 'w', encoding=encoding) as file_merged:
             file_merged.writelines('\n'.join(validated_lines))
         exit(1)
