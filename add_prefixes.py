@@ -8,21 +8,21 @@ prefix_pattern = r"^(&[\d]*\ )"
 linebreak_pattern = r"(\r\n|\r|\n)$"
 
 
-def validate_lines(old_lines: [str], new_lines: [str], file_name_old: str = 'old file',
-                   file_name_new: str = 'new file', interactive: bool = False) -> [[str], ValueError]:
+def validate_lines(translation_lines: [str], template_lines: [str], translation_file_name: str = 'translation file',
+                   template_file_name: str = 'template file', interactive: bool = False) -> [[str], ValueError]:
     """
     Validates that the content of an old, outdated translation and a new translation template can be merged. For some
     inconsistencies the user will be asked for a decision.
 
     Parameters
     ----------
-    old_lines : [str]
+    translation_lines : [str]
         All lines of the outdated translation file, containing translation bits
-    new_lines : [str]
+    template_lines : [str]
         All lines of the current translation template file, missing translation bits
-    file_name_old : str
+    translation_file_name : str
         Name of the outdated translation file, for more expressive error messages
-    file_name_new : str
+    template_file_name : str
         Name of the current translation file template, for more expressive error messages
     interactive : bool
         If true, an error can be resolved by user input, if possible
@@ -33,73 +33,77 @@ def validate_lines(old_lines: [str], new_lines: [str], file_name_old: str = 'old
         A list of all validated lines (including user decisions) and an Error in case of an validation error or user
         cancel. Even in case of an error the list of validated lines should be stored.
     """
-    if len(old_lines) != len(new_lines):
-        raise ValueError(f'The given files have a different lines count: {len(old_lines)} ({file_name_old}) vs ' +
-                         f'{len(new_lines)} ({file_name_new}).')
+    if len(translation_lines) != len(template_lines):
+        raise ValueError(
+            f'The given files have a different lines count: {len(translation_lines)} ({translation_file_name}) vs ' +
+            f'{len(template_lines)} ({template_file_name}).')
 
     errors: [str] = []
     current_prefix = ''
     validated_lines: [str] = []
-    line_no_iter = iter(range(0, len(old_lines)))
+    line_no_iter = iter(range(0, len(translation_lines)))
     for line_no in line_no_iter:
-        old_line = re.sub(linebreak_pattern, '', old_lines[line_no])
-        new_line = re.sub(linebreak_pattern, '', new_lines[line_no])
-        if ((line_no + 1) % 2) == 1:  # even number -> English. Compare old with new version.
-            found = re.search(prefix_pattern, new_line, re.MULTILINE)
+        old_line = re.sub(linebreak_pattern, '', translation_lines[line_no])
+        template_line = re.sub(linebreak_pattern, '', template_lines[line_no])
+        if ((line_no + 1) % 2) == 1:  # even number -> English. Compare with possibly newer template version.
+            found = re.search(prefix_pattern, template_line, re.MULTILINE)
             if found:
                 current_prefix = found.group(1)
             else:
                 current_prefix = ''
-            if current_prefix + old_line == new_line or old_line == new_line:
+            if current_prefix + old_line == template_line or old_line == template_line:
                 if len(errors) == 0:
-                    validated_lines.append(new_line)
+                    validated_lines.append(template_line)
             else:
-                old_line_translation = re.sub(linebreak_pattern, '', old_lines[line_no + 1])
-                new_line_translation = re.sub(linebreak_pattern, '', new_lines[line_no + 1])
-                if old_line_translation.startswith("//"):  # we're still in the comment section
-                    if not new_line_translation.startswith("//"):
+                translation_line = re.sub(linebreak_pattern, '', translation_lines[line_no + 1])
+                if translation_line.startswith("//"):  # we're still in the comment section
+                    translation_line_in_template = re.sub(linebreak_pattern, '', template_lines[line_no + 1])
+                    if not translation_line_in_template.startswith("//"):
                         errors.append(
-                            f'Line {line_no + 1} is a comment in {file_name_old}, but not in {file_name_new}.')
+                            f'Line {line_no + 1} is a comment in {translation_file_name}, '
+                            f'but not in {template_file_name}.')
                     else:
-                        validated_lines.append(new_line)
+                        validated_lines.append(template_line)
                 elif interactive and len(errors) == 0:  # if there are already unsolved errors: just find more errors
                     print(f'Line {line_no + 1} differs:\n'
-                          f'{old_line} ({file_name_old})\n'
-                          f'{new_line} ({file_name_new})\n')
+                          f'{old_line} ({translation_file_name})\n'
+                          f'{template_line} ({template_file_name})\n')
                     print(f'The translation is:\n'
-                          f'{old_line_translation} ({file_name_old})\n')
+                          f'{translation_line} ({translation_file_name})\n')
                     if len(errors) == 0:
                         choice: str = ''
                         while choice not in ['1', '2', '3']:
-                            choice = input('Enter number:\n'
-                                           '(1) Keep new english line and old translation line\n'
-                                           '(2) Keep new english line and enter new custom line\n'
+                            choice = input('Enter number:\n' +
+                                           f'(1) Keep english line from ${template_file_name} line and translation ' +
+                                           f'from ${translation_file_name}\n' +
+                                           f'(2) Keep english line ${template_file_name} and enter new custom line\n' +
                                            '(3) Abort\n')
                         if choice == '1':
                             next(line_no_iter)
-                            validated_lines.append(new_line)
-                            validated_lines.append(old_line_translation)
+                            validated_lines.append(template_line)
+                            validated_lines.append(translation_line)
                             print('--------------\n')
                         elif choice == '2':
                             next(line_no_iter)
-                            validated_lines.append(new_line)
+                            validated_lines.append(template_line)
                             translation = input('\nNew translation:\n')
                             validated_lines.append(re.sub(linebreak_pattern, '', translation))
                             print('--------------\n')
                         else:
-                            errors.append(f'Line {line_no + 1} differs: "{old_line}" ({file_name_old} with ' +
-                                          f'interpolated prefix) vs "{new_line}" ({file_name_new}).')
+                            errors.append(f'Line {line_no + 1} differs: "{old_line}" ({translation_file_name} with ' +
+                                          f'interpolated prefix) vs "{template_line}" ({template_file_name}).')
                 else:
-                    errors.append(f'Line {line_no + 1} differs: "{old_line}" ({file_name_old} with ' +
-                                  f'interpolated prefix) vs "{new_line}" ({file_name_new}).')
+                    errors.append(f'Line {line_no + 1} differs: "{old_line}" ({translation_file_name} with ' +
+                                  f'interpolated prefix) vs "{template_line}" ({template_file_name}).')
         else:
             found = re.search(prefix_pattern, old_line, re.MULTILINE)
             if found is None or (found.group(1) == current_prefix):
                 if len(errors) == 0:
                     validated_lines.append(old_line)
             else:
-                errors.append(f'Line {line_no + 1} has different prefixes: "{found.group(1)}" ({file_name_old}) vs ' +
-                              f'"{current_prefix}" {file_name_new}).')
+                errors.append(
+                    f'Line {line_no + 1} has different prefixes: "{found.group(1)}" ({translation_file_name}) vs ' +
+                    f'"{current_prefix}" {template_file_name}).')
 
     if len(errors) == 0:
         return validated_lines, None
@@ -107,7 +111,7 @@ def validate_lines(old_lines: [str], new_lines: [str], file_name_old: str = 'old
         return validated_lines, ValueError('Some lines don\'t match: ' + '\n'.join(errors))
 
 
-def __get_adjusted_translation_line__(to_adjust: str, current_prefix: str) -> str:
+def __get_adjusted_translation_line__(to_adjust: str, current_prefix: str, current_line: int) -> str:
     """
     Takes a line and adds the prefix to it (in case there isn't already one or current_prefix is empty).
 
@@ -117,6 +121,8 @@ def __get_adjusted_translation_line__(to_adjust: str, current_prefix: str) -> st
         The line with or without a prefix
     current_prefix:
         The current prefix to be used - can be empty
+    current_line: int
+        Provides some context for reporting
 
     Returns
     -------
@@ -126,21 +132,22 @@ def __get_adjusted_translation_line__(to_adjust: str, current_prefix: str) -> st
     found_in_to_adjust = re.search(prefix_pattern, to_adjust, re.MULTILINE)
     # should never fail because of preceding validation, any prefix should match current_prefix
     if found_in_to_adjust and found_in_to_adjust.group(1) != current_prefix:
-        raise ValueError("invalid state")
+        raise ValueError(f'invalid file state around line ${current_line}')
     prefix = '' if found_in_to_adjust else current_prefix
     return prefix + to_adjust
 
 
-def merge_lines(old_lines: [str], new_lines: [str]) -> [str]:
+def merge_lines(translation_lines: [str], template_lines: [str] = None) -> [str]:
     """
     Merges the given old and new lines. See the test for details.
 
     Parameters
     ----------
-    old_lines : [str]
+    translation_lines : [str]
         All lines of the outdated old file, containing translation bits
-    new_lines : [str]
-        All lines of the current translation template file, missing translation bits
+    template_lines : [str]
+        All lines of the current translation template file, missing translation bits. None in case only the translation
+         file shall be used.
 
     Returns
     -------
@@ -149,24 +156,25 @@ def merge_lines(old_lines: [str], new_lines: [str]) -> [str]:
     """
     merged: [str] = []
     current_prefix: str = ''
-    for line_no in range(0, len(old_lines)):
-        old_line = re.sub(linebreak_pattern, '', old_lines[line_no])
-        new_line = re.sub(linebreak_pattern, '', new_lines[line_no])
+    for line_no in range(0, len(translation_lines)):
+        translation_line = re.sub(linebreak_pattern, '', translation_lines[line_no])
+        template_line = translation_line if template_lines is None else re.sub(linebreak_pattern, '',
+                                                                               template_lines[line_no])
         if ((line_no + 1) % 2) == 1:  # even number -> English. We've got to store the prefix, if any
-            found = re.search(prefix_pattern, new_line, re.MULTILINE)
+            found = re.search(prefix_pattern, template_line, re.MULTILINE)
             if found:
                 current_prefix = found.group(1)
             else:
                 current_prefix = ''
-            merged.append(new_line)
+            merged.append(template_line)
         else:
-            old_line_adjusted = __get_adjusted_translation_line__(old_line, current_prefix)
-            new_line_adjusted = __get_adjusted_translation_line__(new_line, current_prefix)
+            adjusted_translation_line = __get_adjusted_translation_line__(translation_line, current_prefix, line_no + 1)
+            adjusted_template_line = __get_adjusted_translation_line__(template_line, current_prefix, line_no + 1)
 
-            if old_line_adjusted == current_prefix:  # old line is empty except for the prefix: take new one
-                merged.append(new_line_adjusted)
+            if adjusted_translation_line == current_prefix:  # old line is empty except for the prefix: take new one
+                merged.append(adjusted_template_line)
             else:  # else take the old one
-                merged.append(old_line_adjusted)
+                merged.append(adjusted_translation_line)
 
     return merged
 
@@ -178,12 +186,12 @@ def run():
     encoding_key = 'encoding'
     parser = argparse.ArgumentParser(description='Validate and merge translation files')
     parser.add_argument(translation_file_key, help='Location of the old file with the translation data')
-    parser.add_argument('--'+template_file_key,
+    parser.add_argument('--' + template_file_key,
                         help='Location of the template file, preferably without any translated lines. Required for ' +
                              'better validation and prefix determination.')
-    parser.add_argument('--'+output_file_key,
+    parser.add_argument('--' + output_file_key,
                         help='Location of the output file', default='merged.trs')
-    parser.add_argument('--'+encoding_key, help='The encoding of the input and output files ', default='utf-8',
+    parser.add_argument('--' + encoding_key, help='The encoding of the input and output files ', default='utf-8',
                         choices=['utf-8', 'cp1252'])
     parsed_args = parser.parse_args()
 
@@ -197,12 +205,19 @@ def run():
     old_lines: [str]
     new_lines: [str]
 
-    with open(file_name_translation, 'r', encoding=encoding) as file_old, open(file_name_template, 'r',
-                                                                               encoding=encoding) as file_new:
-        old_lines = file_old.readlines()
-        new_lines = file_new.readlines()
+    if file_name_template is None:
+        process_without_template(encoding, file_name_translation, output_file)
+    else:
+        process_with_template(encoding, file_name_translation, file_name_template, output_file)
 
-    [validated_lines, error] = validate_lines(old_lines, new_lines, file_name_translation, file_name_template, True)
+
+def process_with_template(encoding, file_name_translation, file_name_template, output_file):
+    with open(file_name_translation, 'r', encoding=encoding) as translation_file, \
+            open(file_name_template, 'r', encoding=encoding) as template_file:
+        translation_lines = translation_file.readlines()
+        template_lines = template_file.readlines()
+    [validated_lines, error] = validate_lines(translation_lines, template_lines, file_name_translation,
+                                              file_name_template, True)
     if error is not None:
         print(f'{str(error)}\n'
               f'--------------\n'
@@ -213,7 +228,15 @@ def run():
             file_merged.writelines('\n'.join(validated_lines))
         exit(1)
     else:
-        merged = merge_lines(validated_lines, new_lines)
+        merged = merge_lines(validated_lines, template_lines)
+        with open(output_file, 'w', encoding=encoding) as file_merged:
+            file_merged.writelines('\n'.join(merged))
+
+
+def process_without_template(encoding, file_name_translation, output_file):
+    with open(file_name_translation, 'r', encoding=encoding) as translation_file:
+        lines = translation_file.readlines()
+        merged = merge_lines(lines)
         with open(output_file, 'w', encoding=encoding) as file_merged:
             file_merged.writelines('\n'.join(merged))
 
