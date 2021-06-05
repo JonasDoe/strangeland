@@ -5,10 +5,19 @@ Tooling for the Strangeland translation.
 ## `add_prefixes.py`
 
 Note that this feature will be renamed soon since the focus of this project is shifting towards an interactive
-validation/merge process (see validation infos below).
+validation/merge process (see validation infos below). Use this script to migrate an outdated translation without
+prefixes (like `&31`) to a new one.
 
-Use this script to migrate an outdated translation without prefixes (like `&31`) to a new one. You need the to download
-the file `add_prefixes.py` and must call it with one to four arguments, e.g.
+## Installation
+
+You need the to download at least `add_prefixes.py` and `requirements.txt` and put them into the same folder. From that
+folder, run `pip install -r requirements.txt` one time to install dependencies. For example, if you're under Windows,
+open your command line (e.g. press WIN+R, enter `cmd`, press Enter) and navigate to the folder with `cd C:\my\folder`.
+If you have to chance the drive to, say, `D:`, type `D:` and press Enter before you run the `cd` command.
+
+## Running the Script
+
+You can call the script with one to four arguments, e.g.
 
 ```shell
 python add_prefixes.py my_translation.trs --template=template.trs --encoding=utf-8 --output=merged.trs
@@ -21,20 +30,20 @@ python add_prefixes.py my_translation.trs --template=template.trs --encoding=utf
   from english lines in the translation file will still be added to translated lines where missing, and different
   suffixes between both lines will be reported.
 - `--encoding` specifies the encoding of the input files and of the output file. Optional - when left empty,
-  auto-detection will be triggered. If you're facing issues with that, set the encoding manually with this
-  argument, e.g. to `utf-8` or `cp1252`. Make sure all files have the same encoding in that case.
+  auto-detection will be triggered. If you're facing issues with that, set the encoding manually with this argument,
+  e.g. to `utf-8` or `cp1252`. Make sure all files have the same encoding in that case.
 - `--output` specifies where the merged/fixed file shall be stored. Optional, defaults to `merged.trs`. Overrides any
   existing file
 
 File paths are allowed. Note that in case the file locations contain any spaces, they must be put in quotes. So a file
-input might look like e.g. `"strangeland/german - version 1"`.
+input might look like e.g. `"strangeland\german - version 1.trs"`.
 
 Python 3 or higher must be available. In case you've already installed it, open the Windows Command Prompt and insert
 the line above. In case you've just downloaded it somewhere and Windows doesn't know what `python` means, you must run
 it with something like
 
 ```shell
-my/path/to/python.exe add_prefixes.py my_translation.trs --template=template.trs
+my\path\to\python.exe add_prefixes.py my_translation.trs --template=template.trs
 ```
 
 ### Merging Behavior
@@ -155,10 +164,15 @@ that doesn't help, resort to the next section.
 
 ### I don't get all this encoding stuff figured out
 
-Open the files you're using in Notepad++. Select `Encoding -> Convert To UTF-8`. Save the files. Run the script
+Open the files you're using in Notepad++. Select `Encoding -> Convert to UTF-8`. Save the files. Run the script
 with `--enconding=utf8`.
 
 ### The script takes years to start
 
 Maybe the files are unreasonable large. Split them into smaller ones. Or the auto-detection of the proper encoding is
 slowing down the process. Set the encoding manually.
+
+### The command `python` or the command `pip` isn't found
+
+Download the latest python installer from [python.org](https://www.python.org) for your platform and run it. pip, used
+to pull dependencies, comes bundled with that installation. 
