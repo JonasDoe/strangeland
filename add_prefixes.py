@@ -106,7 +106,7 @@ def validate_lines(translation: FileData, template: FileData, interactive: bool 
         else:
             found = re.search(prefix_pattern, old_line, re.MULTILINE)
             if found is None or (found.group(1) == current_prefix):
-                if len(errors) == 0: # in case there was already an error we don't append new lines
+                if len(errors) == 0:  # in case there was already an error we don't append new lines
                     validated_lines.append(old_line)
             else:
                 errors.append(
@@ -202,8 +202,7 @@ def run():
     parser.add_argument('--' + encoding_key,
                         help='The encoding of the input and output files. If not set,'
                              'auto-detection will be applied (which might slow down the progress) ',
-                        default=None,
-                        choices=['utf-8', 'cp1252'])
+                        default=None)
     parsed_args = parser.parse_args()
 
     file_name_translation: str = getattr(parsed_args, translation_file_key)
@@ -256,7 +255,7 @@ def read_file_lines(file_name: str, encoding: str = None) -> ([str], str):
             detector = UniversalDetector()
             detector.feed(file_bytes)
             result = detector.close()
-            if result['confidence'] >= .9:
+            if result['confidence'] >= .3:
                 encoding = result['encoding']
                 return file_bytes.decode(encoding).splitlines(), encoding
             else:
