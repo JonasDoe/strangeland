@@ -11,9 +11,10 @@ prefixes (like `&31`) to a new one.
 ## Installation
 
 You need the to download at least `add_prefixes.py` and `requirements.txt` and put them into the same folder. From that
-folder, run `pip install -r requirements.txt` one time to install dependencies. For example, if you're under Windows,
-open your command line (e.g. press WIN+R, enter `cmd`, press Enter) and navigate to the folder with `cd C:\my\folder`.
-If you have to chance the drive to, say, `D:`, type `D:` and press Enter before you run the `cd` command.
+folder, run `pip install -r requirements.txt` one time to install dependencies.
+For example, if you're under Windows, open your command line (e.g. press WIN+R, enter `cmd`, press Enter) and navigate 
+to the folder with `cd C:\my\folder`. If you have to change the drive to, say, `D:`, type `D:` and press Enter before 
+you run the `cd` command.
 
 ## Running the Script
 
