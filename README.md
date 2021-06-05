@@ -20,15 +20,16 @@ python add_prefixes.py my_translation.trs --template=template.trs --encoding=utf
   here can shoved into the translation file. If it's not set, no lines will be validated against a template. Suffixes
   from english lines in the translation file will still be added to translated lines where missing, and different
   suffixes between both lines will be reported.
-- `--encoding` specifies the encoding of the input files and of the output file. Optional, defaults to `utf-8`,
-  but `cp1252` is possible, too.
+- `--encoding` specifies the encoding of the input files and of the output file. Optional - when left empty,
+  auto-detection will be triggered. If you're facing issues with that, set the encoding manually with this
+  argument, e.g. to `utf-8` or `cp1252`. Make sure all files have the same encoding in that case.
 - `--output` specifies where the merged/fixed file shall be stored. Optional, defaults to `merged.trs`. Overrides any
   existing file
 
 File paths are allowed. Note that in case the file locations contain any spaces, they must be put in quotes. So a file
 input might look like e.g. `"strangeland/german - version 1"`.
 
-Python 3.7 or higher must be available. In case you've already installed it, open the Windows Command Prompt and insert
+Python 3 or higher must be available. In case you've already installed it, open the Windows Command Prompt and insert
 the line above. In case you've just downloaded it somewhere and Windows doesn't know what `python` means, you must run
 it with something like
 
@@ -131,3 +132,33 @@ lost!
 - It's often hard to see the differences between old and new. I know, but for now I want this script to have as little
   requirements as possible, so colored fonts or sophisticated text diff analysis have to wait until there's really
   massive need for that.
+
+## Troubleshooting
+
+### I get the error `Aborted: Python 3.x required`
+
+You're using the wrong Python version. Even if you have Python 3 on your computer, it might be that the command `python`
+still points to an older installment. You can run `python -v` to see which version is actually used. Adjust your `PATH`
+variable accordingly. If you don't know how to do that, don't run the script with `python` but
+with `full/path/to/python/with/correct/version/python.exe` (or without `.exe` on non-Windows systems).
+
+### I get an UnicodeDecodeError
+
+You've set a wrong encoding, e.g. a cp1252-encoded file with utf-8 encoding set. Try to run the script with the another
+encoding or remove the encoding for auto-detection.
+
+### I get weird letters displayed
+
+You're reading a file with the wrong encoding set. Make sure that translation as well as the template file have the same
+encoding. Run the script with no encoding for auto-detection or try to run it with the proper `--encoding` argument. If
+that doesn't help, resort to the next section.
+
+### I don't get all this encoding stuff figured out
+
+Open the files you're using in Notepad++. Select `Encoding -> Convert To UTF-8`. Save the files. Run the script
+with `--enconding=utf8`.
+
+### The script takes years to start
+
+Maybe the files are unreasonable large. Split them into smaller ones. Or the auto-detection of the proper encoding is
+slowing down the process. Set the encoding manually.
