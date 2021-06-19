@@ -1,6 +1,8 @@
 import re
 import argparse
-from chardet.universaldetector import UniversalDetector
+import subprocess
+
+import pkg_resources
 
 """Used to find prefixes like '&31 '"""
 prefix_pattern = r"^(&[\d]*\ )"
@@ -192,6 +194,7 @@ def run():
     template_file_key = 'template'
     output_file_key = 'output'
     encoding_key = 'encoding'
+    debug_key = 'debug'
     parser = argparse.ArgumentParser(description='Validate and merge translation files')
     parser.add_argument(translation_file_key, help='Location of the old file with the translation data')
     parser.add_argument('--' + template_file_key,
@@ -203,25 +206,40 @@ def run():
                         help='The encoding of the input and output files. If not set,'
                              'auto-detection will be applied (which might slow down the progress) ',
                         default=None)
-    parsed_args = parser.parse_args()
+    parser.add_argument('--' + debug_key, default=False, help='Enables debug mode. '
+                                                              'Don\'t use it in case you just want to run the script')
+    parsed_args: argparse.Namespace
+    try:
+        parsed_args = parser.parse_args()
+    except Exception as err:
+        print(f'Couldn\'t process the given arguments: {err}')
+        exit(1)
 
     file_name_translation: str = getattr(parsed_args, translation_file_key)
     file_name_template: str = getattr(parsed_args, template_file_key)
     encoding_from_arg: str = getattr(parsed_args, encoding_key)
     output_file: str = getattr(parsed_args, output_file_key)
+    debug: bool = getattr(parsed_args, debug_key)
     # sys.stdout.reconfigure(encoding='cp1252')
     # sys.stdin.reconfigure(encoding=encoding)
 
-    old_lines: [str]
-    new_lines: [str]
+    try:
+        old_lines: [str]
+        new_lines: [str]
 
-    translation, encoding = read_file_lines(file_name_translation, encoding_from_arg)
-    if file_name_template is None:
-        process_without_template(FileData(file_name_translation, translation), output_file, encoding)
-    else:
-        template, _ = read_file_lines(file_name_template, encoding_from_arg)
-        process_with_template(FileData(file_name_translation, translation), FileData(file_name_template, template),
-                              output_file, encoding)
+        translation, encoding = read_file_lines(file_name_translation, encoding_from_arg)
+        if file_name_template is None:
+            process_without_template(FileData(file_name_translation, translation), output_file, encoding)
+        else:
+            template, _ = read_file_lines(file_name_template, encoding_from_arg)
+            process_with_template(FileData(file_name_translation, translation), FileData(file_name_template, template),
+                                  output_file, encoding)
+    except Exception as err:
+        if debug:
+            raise err
+        else:
+            print(str(err))
+            exit(1)
 
 
 def process_with_template(translation: FileData, template: FileData, output_file: str, output_encoding: str):
@@ -250,7 +268,13 @@ def process_without_template(translation: FileData, output_file: str, output_enc
 
 def read_file_lines(file_name: str, encoding: str = None) -> ([str], str):
     if encoding is None:
+        if 'chardet' not in pkg_resources.working_set.by_key:
+            print("Required module to autodetect encodings was not found. Attempting to install it.")
+            # https://stackoverflow.com/a/44210735/5767484
+            python = sys.executable
+            subprocess.check_call([python, '-m', 'pip', 'install', 'chardet'], stdout=subprocess.DEVNULL)
         with open(file_name, 'rb') as file:
+            from chardet.universaldetector import UniversalDetector
             file_bytes = file.read()
             detector = UniversalDetector()
             detector.feed(file_bytes)
