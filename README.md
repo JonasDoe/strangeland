@@ -10,10 +10,7 @@ prefixes (like `&31`) to a new one.
 
 ## Installation
 
-You need the to download at least `add_prefixes.py` and `requirements.txt` and put them into the same folder. From that
-folder, run `pip install -r requirements.txt` one time to install dependencies. For example, if you're under Windows,
-open your command line (e.g. press WIN+R, enter `cmd`, press Enter) and navigate to the folder with `cd C:\my\folder`.
-If you have to chance the drive to, say, `D:`, type `D:` and press Enter before you run the `cd` command.
+You need the to download at `add_prefixes.py` and `requirements.txt` and have python installed.
 
 ## Running the Script
 
@@ -159,8 +156,8 @@ encoding or remove the encoding for auto-detection.
 ### I get weird letters displayed
 
 You're reading a file with the wrong encoding set. Make sure that translation as well as the template file have the same
-encoding. Run the script with no encoding for auto-detection or try to run it with the proper `--encoding` argument. If
-that doesn't help, resort to the next section.
+encoding. Run the script with no encoding to enable auto-detection or try to run it with the proper `--encoding`
+argument. If that doesn't help, resort to the next section.
 
 ### I don't get all this encoding stuff figured out
 
@@ -172,7 +169,7 @@ with `--enconding=utf8`.
 Maybe the files are unreasonable large. Split them into smaller ones. Or the auto-detection of the proper encoding is
 slowing down the process. Set the encoding manually.
 
-### The command `python` or the command `pip` isn't found
+### The command `python` isn't found
 
 Download the latest python installer from [python.org](https://www.python.org) for your platform and run it. pip, used
-to pull dependencies, comes bundled with that installation. 
+to pull dependencies, comes bundled with that installation.
