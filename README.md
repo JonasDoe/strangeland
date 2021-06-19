@@ -10,7 +10,7 @@ prefixes (like `&31`) to a new one.
 
 ## Installation
 
-You need the to download at `add_prefixes.py` and `requirements.txt` and have python installed.
+You need to download `add_prefixes.py` and `requirements.txt` and have python installed.
 
 ## Running the Script
 
@@ -171,5 +171,4 @@ slowing down the process. Set the encoding manually.
 
 ### The command `python` isn't found
 
-Download the latest python installer from [python.org](https://www.python.org) for your platform and run it. pip, used
-to pull dependencies, comes bundled with that installation.
+Download the latest python installer from [python.org](https://www.python.org) for your platform and run it.
