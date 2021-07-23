@@ -1,6 +1,6 @@
 # Strangeland
 
-Tooling for the Strangeland translation.
+Tooling for the Strangeland translation (and other AGS translation files).
 
 ## `add_prefixes.py`
 
@@ -62,7 +62,7 @@ The script runs some validations to ensure the files are similar enough to work 
 
 - the number of lines in both files isn't equal
 - the English texts in both files are different (expect for missing prefixes, those are okay)
-- the prefix is the translated line differs from the english one above
+- the prefix in the translated line differs from the english one above
 - other, more unlikely cases
 
 For certain cases, interactive solving is possible (see `Validation`).
